@@ -5,10 +5,14 @@ import time
 import sys
 from Fuzz_Connect import *
 from Pkt_Configurer import *
+import os
                           
 	
 
 def main():
+	if not os.path.exists('logs'):
+		os.makedirs('logs')
+		
 	with open('config/config.yaml', "r") as stream:
 			data = yaml.safe_load(stream)
 	input_list = open(data["input_file"]).read().splitlines()
@@ -62,7 +66,7 @@ def run_sequences(seq_nums, input_list, seq):
 	"starts the fuzzing functionality for the given control packet types and input list"
 	for i in range(len(input_list)):
 		if "1" in seq_nums:
-			seq.utils.connect_log.info("### Starting CONNECT Sequence ###")						
+			seq.utils.connect_log.info("### Starting CONNECT Sequence###")						
 			seq.connect_sequence(input_list[i])
 		if "2" in seq_nums:
 			seq.utils.connack_log.info("### Starting CONNACK Sequence ###")									

@@ -27,7 +27,7 @@ class Fuzz_Sequence:
 	
 	def connect_sequence(self, fuzz_data):
 		"CONNECT - Generates dictionaries(fieldname: datatype) of every possible param combination"
-		print("### Starting CONNECT Sequence ###")
+		print("### Starting CONNECT Sequence###\nFuzz: " + fuzz_data)
 		params = { 
 			"clientId": str,
 			"protoname": str,
@@ -64,7 +64,7 @@ class Fuzz_Sequence:
 	
 	def connack_sequence(self, fuzz_data):
 		"CONNACK - Generates dictionaries(fieldname: datatype) of every possible param combination"
-		print("### Starting CONNACK Sequence ###")			
+		print("### Starting CONNACK Sequence ###\nFuzz: " + fuzz_data)			
 		params = {
 			"sessexpiry": int,
 			"rec_max": ShortField,
@@ -99,7 +99,7 @@ class Fuzz_Sequence:
 		
 	def pub_sequence(self, fuzz_data, pub_type):
 		"PUBACK PUBREC PUBREL PUBCOMP - Generates dictionaries(fieldname: datatype) of every possible param combination"
-		print("### Starting " + pub_type + " Sequence ###")	
+		print("### Starting " + pub_type + " Sequence ###\nFuzz: " + fuzz_data)	
 		params = {
 			"msgid": ShortField ,
 			"reason_code": ByteField,
@@ -133,7 +133,7 @@ class Fuzz_Sequence:
 		
 	def publish_sequence(self, fuzz_data):
 		"PUBLISH -  - Generates dictionaries(fieldname: datatype) of every possible param combination"
-		print("### Starting PUBLISH Sequence ###")
+		print("### Starting PUBLISH Sequence ###\nFuzz: " + fuzz_data)
 		publish_param = { 
 			"topic": str,
 			"value": str,
@@ -159,7 +159,7 @@ class Fuzz_Sequence:
 	
 	def subscribe_sequence(self, fuzz_data):
 		"SUBSCRIBE - Generates dictionaries(fieldname: datatype) of every possible param combination"
-		print("### Starting SUBSCRIBE Sequence ###")
+		print("### Starting SUBSCRIBE Sequence ###\nFuzz: " + fuzz_data)
 		params = { 
 			"msgid": int,
 			"topics": str,
