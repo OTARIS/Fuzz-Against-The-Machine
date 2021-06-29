@@ -1,0 +1,7 @@
+--- 
+ msgid: 1
+ reason_code: 1
+ reason_string: "reason_str"
+ keyval:
+   key: "KEY"
+   value: "VALUE"

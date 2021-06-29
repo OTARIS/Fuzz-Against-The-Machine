@@ -1,0 +1,4 @@
+---
+ target_ip: "10.0.2.232"
+ target_port: 1883
+ input_file : "input/input.txt"

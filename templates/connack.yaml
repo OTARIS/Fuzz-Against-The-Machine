@@ -1,0 +1,18 @@
+---
+ sessexpiry: 59
+ rec_max: 500
+ max_qos: 1
+ retain_avail: 1
+ max_pkt: 70
+ clientId: "client_1234"
+ top_alias: 20
+ reason_string: "reason_string"
+ keyval:
+   key: "MY_PROPERTY"
+   value: "MY_VALUE"
+ wild_sub: 1
+ sub_id: 1
+ shared_sub: 1
+ server_klive: 125
+ res_info: "res_info"
+ server_ref: "server_ref"
