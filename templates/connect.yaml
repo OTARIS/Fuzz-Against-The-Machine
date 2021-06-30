@@ -1,6 +1,6 @@
 ---
  clientId: 
- protoname: 
+ protoname: MQTT
  willtopic:
  willmsg: 
  username:

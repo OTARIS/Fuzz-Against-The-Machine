@@ -11,7 +11,7 @@ class Pkt_Configurer:
 		self.seq = seq
 
 	def read_yaml(self, yml):
-		"read yaml file an return dictionary"
+		"read yaml file and return dictionary"
 		with open(yml, "r") as stream:
 			return yaml.safe_load(stream)
 				

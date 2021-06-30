@@ -223,7 +223,6 @@ class Utils:
 			print("FAIL", err, str(CONTROL_PACKET_TYPE[pkt.type]))
 			print("FAIL PACKET:", pkt.build())
 			pass	
-	
 		
 	def finalize(self):
 		"close socket connection"

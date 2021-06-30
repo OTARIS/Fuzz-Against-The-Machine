@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 from Fuzz_Sequence import *
 import logging
 import threading
@@ -7,8 +8,6 @@ from Fuzz_Connect import *
 from Pkt_Configurer import *
 import os
                           
-	
-
 def main():
 	if not os.path.exists('logs'):
 		os.makedirs('logs')
@@ -18,7 +17,20 @@ def main():
 	input_list = open(data["input_file"]).read().splitlines()
 	dst = data["target_ip"]
 	dport = data["target_port"]
-	art = "    ____                __  _______\n   / __/_  __________  /  |/  / __ \ \n  / /_/ / / /_  /_  / / /|_/ / / / / \n / __/ /_/ / / /_/ /_/ /  / / /_/ / \n/_/  \____/ /___/___/_/  /_/\___\_\ \n\n"
+	art = \
+"""      ___           ___                         ___     
+     /\__\         /\  \                       /\  \    
+    /:/ _/_       /::\  \         ___         |::\  \   
+   /:/ /\__\     /:/\:\  \       /\__\        |:|:\  \  
+  /:/ /:/  /    /:/ /::\  \     /:/  /      __|:|\:\  \ 
+ /:/_/:/  /    /:/_/:/\:\__\   /:/__/      /::::|_\:\__\\
+ \:\/:/  /     \:\/:/  \/__/  /::\  \      \:\~~\  \/__/
+  \::/__/       \::/__/      /:/\:\  \      \:\  \      
+   \:\  \        \:\  \      \/__\:\  \      \:\  \     
+    \:\__\        \:\__\          \:\__\      \:\__\    
+     \/__/         \/__/           \/__/       \/__/    
+      Fuzz        Against           The       Machine
+"""
 	print(art, "\n")
 	
 	seq = Fuzz_Sequence(dst, dport)
@@ -34,7 +46,10 @@ def main():
 		
 	if fuzz_type == "2":
 		fuzz_templates(seq)
-			
+
+	# secret mode for memory leak
+	if fuzz_type == "3":
+		seq.will_prop_sequence()		
 					
 def fuzz_templates(seq):
 	"starts the packet configurer that sends by defined template"

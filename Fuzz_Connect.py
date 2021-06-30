@@ -9,6 +9,7 @@ class Fuzz_Connect:
 		self.proto="MQTT"
 		self.protocolLevel=5
 		self.clientId="client"+str(random.randint(100,1000))
+		self.keepAlive=60
    
 	def connect_std(self):
 		"standard valid connect packet" 
