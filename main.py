@@ -17,6 +17,15 @@ def main():
 	input_list = open(data["input_file"]).read().splitlines()
 	dst = data["target_ip"]
 	dport = data["target_port"]
+	resend_file = data["resend_file"]
+
+	try:
+		seq = Fuzz_Sequence(dst, dport)
+	except ConnectionRefusedError as e:
+		print(e,"\nThe broker seems to be offline")
+		input("Press Enter to continue...")
+		main()	
+	
 	art = \
 """      ___           ___                         ___     
      /\__\         /\  \                       /\  \    
@@ -33,9 +42,7 @@ def main():
 """
 	print(art, "\n")
 	
-	seq = Fuzz_Sequence(dst, dport)
-	
-	print("(1) Fuzzing Sequences (2) Fuzzing Templates")
+	print("(1) Fuzzing Sequences (2) Fuzzing Templates (3) Resend Logfile")
 	fuzz_type = str(input())
 	
 	if fuzz_type == "1":
@@ -47,10 +54,14 @@ def main():
 	if fuzz_type == "2":
 		fuzz_templates(seq)
 
-	# secret mode for memory leak
 	if fuzz_type == "3":
-		seq.will_prop_sequence()		
-					
+		seq.read_log(resend_file)		
+	
+	# secret mode for memory leak
+	if fuzz_type == "4":
+		seq.will_prop_sequence()
+		
+				
 def fuzz_templates(seq):
 	"starts the packet configurer that sends by defined template"
 	print("Choose Packet Types:\n(1) CONNECT, (2) CONNACK, (3) PUBLISH, (4) PUBACK,\n(5) PUBREC,  (6) PUBREL,  (7) PUBCOMP, (8) SUBSCRIBE")

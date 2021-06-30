@@ -1,4 +1,5 @@
 ---
- target_ip: "172.25.253.7"
+ target_ip: "192.168.178.52"
  target_port: 1883
  input_file : "input/input.txt"
+ resend_file: "logs/connect.log"

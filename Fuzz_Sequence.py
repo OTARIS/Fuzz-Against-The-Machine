@@ -196,9 +196,25 @@ class Fuzz_Sequence:
 		f.close()
 
 	def will_prop_sequence(self):
-		"send method for the discovered memory leak vulneralbility" 
+		"send method for the discovered memory leak vulnerability" 
 		sock = socket.socket()
 		sock.connect((self.dst, self.dport))
 		stream_sock = StreamSocket(sock, Raw)
 		pkt = self.connect.fuzz_will_properties_pkt()
 		x = stream_sock.send(Raw(pkt))
+		
+	def resend(self, line):
+		self.utils.init_socket(self.dst, self.dport)
+		time.sleep(0.001)
+		x = self.utils.stream_sock.sr1(Raw(line),timeout=0, verbose=0)	
+		
+	def read_log(self, logfile):
+		log_lines = [line for line in open(logfile).read().splitlines() if line]
+		for i in range(len(log_lines)):
+			s = log_lines[i]
+			line = log_lines[i][24:]
+			if line[0] == "#":
+				continue
+			data = [int(e, base=16) for e in line.split(",")]	
+			self.resend(data)
+
