@@ -27,31 +27,32 @@ def print_banner():
         """)
 
 def main():
+	print_banner()
+
 	if not os.path.exists('logs'):
 		os.makedirs('logs')
 
 	args = parse_args()
 
 	input_list = open(args.input).read().splitlines()
-	dst = args.target.split(':')[0]
-	dport = int(args.target.split(':')[1])
+	try:
+		dst = args.target.split(':')[0]
+		dport = int(args.target.split(':')[1])
+	except:
+		print("[!] Target must be specified like <HOST>:<PORT>")
+		sys.exit(1)
 
-	print_banner()
 	print(f"[+] Target: {dst}:{dport}")
-
 	try:
 		seq = Fuzz_Sequence(dst, dport)
 	except:
 		print("[!] Error connecting to target. Exiting.")
 		sys.exit(1)
 
-
 	if args.sequence:
 		run_sequences(args.packettypes, input_list, seq)
-
 	elif args.template:
 		fuzz_templates(seq)
-
 	else:
 		# guided mode
 		print("(1) Fuzzing Sequences (2) Fuzzing Templates")
@@ -125,10 +126,6 @@ def run_sequences(seq_nums, input_list, seq):
 			seq.utils.pubcomp_log.info("[+] Starting PUBCOMP Sequence")
 			seq.pub_sequence(input_list[i], "PUBCOMP")   
 
-def show_usage(help):
-	print_banner()
-	print(help)
-
 def parse_args():
 	"parses command line arguments"
 	parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
@@ -150,7 +147,7 @@ def parse_args():
 (1) CONNECT, (2) CONNACK, (3) PUBLISH, (4) PUBACK,
 (5) PUBREC,  (6) PUBREL,  (7) PUBCOMP, (8) SUBSCRIBE""")
 
-	parser.usage = show_usage(parser.format_help())  # show help on error
+	parser.usage = parser.format_help() # show help on error
 
 	args = parser.parse_args()
 	if (args.sequence or args.template) and args.packettypes is None:
