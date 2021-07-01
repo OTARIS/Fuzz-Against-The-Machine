@@ -1,5 +1,4 @@
-#!/usr/bin/python3
-
+#!/usr/bin/env python
 from src.Fuzz_Sequence import *
 import logging
 import threading
@@ -12,90 +11,91 @@ from argparse import RawTextHelpFormatter
 
 def print_banner():
 	print("""\
-              ___           ___                         ___     
-             /\__\         /\  \                       /\  \    
-            /:/ _/_       /::\  \         ___         |::\  \   
-           /:/ /\__\     /:/\:\  \       /\__\        |:|:\  \  
-          /:/ /:/  /    /:/ /::\  \     /:/  /      __|:|\:\  \ 
-         /:/_/:/  /    /:/_/:/\:\__\   /:/__/      /::::|_\:\__\\
-         \:\/:/  /     \:\/:/  \/__/  /::\  \      \:\~~\  \/__/
-          \::/__/       \::/__/      /:/\:\  \      \:\  \      
-           \:\  \        \:\  \      \/__\:\  \      \:\  \     
-            \:\__\        \:\__\          \:\__\      \:\__\    
-             \/__/         \/__/           \/__/       \/__/    
-              Fuzz        Against           The       Machine
-        """)
+     ___           ___                         ___     
+    /\__\         /\  \                       /\  \    
+   /:/ _/_       /::\  \         ___         |::\  \   
+  /:/ /\__\     /:/\:\  \       /\__\        |:|:\  \  
+ /:/ /:/  /    /:/ /::\  \     /:/  /      __|:|\:\  \ 
+/:/_/:/  /    /:/_/:/\:\__\   /:/__/      /::::|_\:\__\\
+\:\/:/  /     \:\/:/  \/__/  /::\  \      \:\~~\  \/__/
+ \::/__/       \::/__/      /:/\:\  \      \:\  \      
+  \:\  \        \:\  \      \/__\:\  \      \:\  \     
+   \:\__\        \:\__\          \:\__\      \:\__\    
+    \/__/         \/__/           \/__/       \/__/    
+     Fuzz        Against           The       Machine
+""")
+
 
 def main():
 	print_banner()
+	args = parse_args()
 
 	if not os.path.exists('logs'):
 		os.makedirs('logs')
 
-	args = parse_args()
-
 	input_list = open(args.input).read().splitlines()
+
+	# parse host and port
 	try:
 		dst = args.target.split(':')[0]
 		dport = int(args.target.split(':')[1])
+		print(f"[i] Target: {dst}:{dport}")
 	except:
 		print("[!] Target must be specified like <HOST>:<PORT>")
 		sys.exit(1)
 
-	print(f"[+] Target: {dst}:{dport}")
+	# try connecting to target
 	try:
 		seq = Fuzz_Sequence(dst, dport)
 	except:
 		print("[!] Error connecting to target. Exiting.")
 		sys.exit(1)
 
+	# Mode selection
 	if args.sequence:
 		run_sequences(args.packettypes, input_list, seq)
 	elif args.template:
-		fuzz_templates(seq)
-	else:
-		# guided mode
+		for pkt_type in [p for p in args.packettypes]:
+			seq = Fuzz_Sequence(dst, dport)  # reinitialize socket connection
+			print(f"[+] Sending packet of type {pkt_type}")
+			fuzz_templates(seq, args.packettypes)
+	else: # guided mode
 		print("(1) Fuzzing Sequences (2) Fuzzing Templates")
 		fuzz_type = str(input())
-
 		if fuzz_type == "1":
 			print("Choose Packet Types:\n(1) CONNECT, (2) CONNACK, (3) PUBLISH, (4) PUBACK,\n(5) PUBREC,  (6) PUBREL,  (7) PUBCOMP, (8) SUBSCRIBE")
 			seq_nums = str(input())
-			list(seq_nums)
-			print(seq_nums)
 			run_sequences(seq_nums, input_list, seq)
-
 		if fuzz_type == "2":
-			fuzz_templates(seq)
-
-		# secret mode for memory leak
-		if fuzz_type == "3":
+			while True:
+				print("Choose Packet Types:\n(1) CONNECT, (2) CONNACK, (3) PUBLISH, (4) PUBACK,\n(5) PUBREC,  (6) PUBREL,  (7) PUBCOMP, (8) SUBSCRIBE")
+				for pkt_type in [p for p in str(input())]:
+					seq = Fuzz_Sequence(dst, dport)  # reinitialize socket connection
+					print(f"[+] Sending packet of type {pkt_type}")
+					fuzz_templates(seq, pkt_type)
+		if fuzz_type == "3": #  secret mode for memory leak
 			seq.will_prop_sequence()
-					
-def fuzz_templates(seq):
+
+
+def fuzz_templates(seq, pkt_type):
 	"starts the packet configurer that sends by defined template"
-	print("Choose Packet Types:\n(1) CONNECT, (2) CONNACK, (3) PUBLISH, (4) PUBACK,\n(5) PUBREC,  (6) PUBREL,  (7) PUBCOMP, (8) SUBSCRIBE")
-	configurer = Pkt_Configurer(seq)	
-	while True:
-		pkt_type = str(input()) # TODO
-		if pkt_type == "exit":
-			main()
-		elif pkt_type == "1":
-			configurer.conf_connect()
-		elif pkt_type == "2":
-			configurer.conf_connack()
-		elif pkt_type == "3":
-			configurer.conf_publish()
-		elif pkt_type == "4":
-			configurer.conf_pubsubstatus(4)
-		elif pkt_type == "5":
-			configurer.conf_pubsubstatus(5)
-		elif pkt_type == "6":
-			configurer.conf_pubsubstatus(6)
-		elif pkt_type == "7":
-			configurer.conf_pubsubstatus(7)
-		elif pkt_type == "8":
-			configurer.conf_subscribe()	
+	configurer = Pkt_Configurer(seq)
+	if pkt_type == "1":
+		configurer.conf_connect()
+	elif pkt_type == "2":
+		configurer.conf_connack()
+	elif pkt_type == "3":
+		configurer.conf_publish()
+	elif pkt_type == "4":
+		configurer.conf_pubsubstatus(4)
+	elif pkt_type == "5":
+		configurer.conf_pubsubstatus(5)
+	elif pkt_type == "6":
+		configurer.conf_pubsubstatus(6)
+	elif pkt_type == "7":
+		configurer.conf_pubsubstatus(7)
+	elif pkt_type == "8":
+		configurer.conf_subscribe()
 					
 
 def run_sequences(seq_nums, input_list, seq):
@@ -126,6 +126,7 @@ def run_sequences(seq_nums, input_list, seq):
 			seq.utils.pubcomp_log.info("[+] Starting PUBCOMP Sequence")
 			seq.pub_sequence(input_list[i], "PUBCOMP")   
 
+
 def parse_args():
 	"parses command line arguments"
 	parser = argparse.ArgumentParser(formatter_class=RawTextHelpFormatter)
@@ -140,7 +141,7 @@ def parse_args():
 	opts.add_argument('-i', '--input', type=str, help='File with list of fuzzing inputs, separated by newlines (default: ./input/input.txt)',
 						default="./input/input.txt", required=False)
 	opts.add_argument('-t', '--target', type=str,
-						help='Target IP and Port of the broker to fuzz, separated by a colon (e.g. 192.168.2.1:1800)',
+						help='Target IP and Port of the broker to fuzz, separated by a colon (e.g. 192.168.2.1:1883)',
 						required=True)
 	opts.add_argument('-p', '--packettypes', type=str, help= \
 		"""Packet types, e.g. for types 1,2,3 and 6, enter 1236. Available types are:
@@ -156,4 +157,8 @@ def parse_args():
 	return args
 
 if __name__ == "__main__":
-	main()
+	try:
+		main()
+	except KeyboardInterrupt:
+		print("[!] Exiting")
+		sys.exit(1)
