@@ -2,10 +2,10 @@ from scapy.contrib.mqtt import *
 from scapy.all import *
 import random
 from scapy_mqtt import  *
-from Fuzz_Connect import *
-from Fuzz_Connack import *
-from Fuzz_Publish import *
-from Fuzz_Subscribe import *
+from src.Fuzz_Connect import *
+from src.Fuzz_Connack import *
+from src.Fuzz_Publish import *
+from src.Fuzz_Subscribe import *
 from Utils import *
 import logging
 from itertools import *
@@ -27,7 +27,7 @@ class Fuzz_Sequence:
 	
 	def connect_sequence(self, fuzz_data):
 		"CONNECT - Generates dictionaries(fieldname: datatype) of every possible param combination"
-		print("### Starting CONNECT Sequence###\nFuzz: " + fuzz_data)
+		print("[+] Starting CONNECT Sequence" + f" Sequence with Fuzz: {fuzz_data}")
 		params = { 
 			"clientId": str,
 			"protoname": str,
@@ -57,14 +57,14 @@ class Fuzz_Sequence:
 				params_dict.update(dictdata)
 			
 			self.utils.fuzz_by_param(params_dict, "CONNECT", fuzz_data)
-		print("\tCONNECT packets sent:", Utils.connect_count)	
-		print("\tTotal packets sent:", Utils.pkt_count, "\n")
+		print(f"    CONNECT packets sent: {Utils.connect_count}")
+		print(f"    Total packets sent: {Utils.pkt_count}")
 		Utils.connect_count = 0	
 	
 	
 	def connack_sequence(self, fuzz_data):
 		"CONNACK - Generates dictionaries(fieldname: datatype) of every possible param combination"
-		print("### Starting CONNACK Sequence ###\nFuzz: " + fuzz_data)			
+		print("[+] Starting CONNACK Sequence" + f" Sequence with Fuzz: {fuzz_data}")
 		params = {
 			"sessexpiry": int,
 			"rec_max": ShortField,
@@ -92,14 +92,14 @@ class Fuzz_Sequence:
 			for dictdata in element:
 				params_dict.update(dictdata)
 			self.utils.fuzz_by_param(params_dict, "CONNACK", fuzz_data)	
-		print("\tCONNACK packets sent:", Utils.connack_count)	
-		print("\tTotal packets sent:", Utils.pkt_count, "\n")
+		print(f"    CONNACK packets sent: {Utils.connack_count}")
+		print(f"    Total packets sent: {Utils.pkt_count}")
 		Utils.connack_count = 0	
 	
 		
 	def pub_sequence(self, fuzz_data, pub_type):
 		"PUBACK PUBREC PUBREL PUBCOMP - Generates dictionaries(fieldname: datatype) of every possible param combination"
-		print("### Starting " + pub_type + " Sequence ###\nFuzz: " + fuzz_data)	
+		print("[+] Starting " + pub_type + f" Sequence with Fuzz: {fuzz_data}")
 		params = {
 			"msgid": ShortField ,
 			"reason_code": ByteField,
@@ -117,23 +117,23 @@ class Fuzz_Sequence:
 				params_dict.update(dictdata)
 			self.utils.fuzz_by_param(params_dict, pub_type, fuzz_data)
 		if pub_type == "PUBACK":
-			print("\tPUBACK packets sent:", Utils.puback_count)
+			print(f"     PUBACK packets sent: {Utils.puback_count}")
 			Utils.puback_count = 0
 		if pub_type == "PUBREC":
-			print("\tPUBREC packets sent:", Utils.pubrec_count)
+			print(f"    PUBREC packets sent: {Utils.pubrec_count}")
 			Utils.pubrec_count = 0
 		if pub_type == "PUBREL":
-			print("\tPUBREL packets sent:", Utils.pubrel_count)
+			print(f"    PUBREL packets sent: {Utils.pubrel_count}")
 			Utils.pubrel_count = 0
 		if pub_type == "PUBCOMP":
-			print("\tPUBCOMP packets sent:", Utils.pubcomp_count)
+			print(f"    PUBCOMP packets sent: {Utils.pubcomp_count}")
 			Utils.pubcomp_count = 0
-		print("\tTotal packets sent:", Utils.pkt_count, "\n")
+		print(f"    Total packets sent: {Utils.pkt_count}")
 
 		
 	def publish_sequence(self, fuzz_data):
 		"PUBLISH -  - Generates dictionaries(fieldname: datatype) of every possible param combination"
-		print("### Starting PUBLISH Sequence ###\nFuzz: " + fuzz_data)
+		print("[+] Starting PUBLISH Sequence" + f" Sequence with Fuzz: {fuzz_data}")
 		publish_param = { 
 			"topic": str,
 			"value": str,
@@ -152,14 +152,14 @@ class Fuzz_Sequence:
 			for dictdata in element:
 				params_dict.update(dictdata)
 			self.utils.fuzz_by_param(params_dict, "PUBLISH", fuzz_data)
-		print("\tPUBLISH packets sent:", Utils.publish_count)	
-		print("\tTotal packets sent:", Utils.pkt_count, "\n")
+		print(f"    PUBLISH packets sent: {Utils.publish_count}")
+		print(f"    Total packets sent: {Utils.pkt_count}")
 		Utils.publish_count = 0			
 	
 	
 	def subscribe_sequence(self, fuzz_data):
 		"SUBSCRIBE - Generates dictionaries(fieldname: datatype) of every possible param combination"
-		print("### Starting SUBSCRIBE Sequence ###\nFuzz: " + fuzz_data)
+		print("[+] Starting SUBSCRIBE Sequence" + f" Sequence with Fuzz: {fuzz_data}")
 		params = { 
 			"msgid": int,
 			"topics": str,
@@ -174,8 +174,8 @@ class Fuzz_Sequence:
 			for dictdata in element:
 				params_dict.update(dictdata)			
 			self.utils.fuzz_by_param(params_dict, "SUBSCRIBE", fuzz_data)
-		print("\tSUBSCRIBE packets sent:", Utils.subscribe_count)	
-		print("\tTotal packets sent:", Utils.pkt_count, "\n")			
+		print(f"    SUBSCRIBE packets sent: {Utils.subscribe_count}")
+		print(f"    Total packets sent: {Utils.pkt_count}")
 	
 	
 	def check_broker_conn(self, runs):
@@ -196,25 +196,10 @@ class Fuzz_Sequence:
 		f.close()
 
 	def will_prop_sequence(self):
-		"send method for the discovered memory leak vulnerability" 
+		"send method for the discovered memory leak vulneralbility" 
 		sock = socket.socket()
 		sock.connect((self.dst, self.dport))
 		stream_sock = StreamSocket(sock, Raw)
 		pkt = self.connect.fuzz_will_properties_pkt()
 		x = stream_sock.send(Raw(pkt))
-		
-	def resend(self, line):
-		self.utils.init_socket(self.dst, self.dport)
-		time.sleep(0.001)
-		x = self.utils.stream_sock.sr1(Raw(line),timeout=0, verbose=0)	
-		
-	def read_log(self, logfile):
-		log_lines = [line for line in open(logfile).read().splitlines() if line]
-		for i in range(len(log_lines)):
-			s = log_lines[i]
-			line = log_lines[i][24:]
-			if line[0] == "#":
-				continue
-			data = [int(e, base=16) for e in line.split(",")]	
-			self.resend(data)
 
