@@ -2,7 +2,7 @@ from scapy.contrib.mqtt import *
 from scapy.all import *
 from scapy_mqtt import  *
 import yaml
-from Fuzz_Sequence import *
+from src.Fuzz_Sequence import *
 
 
 class Pkt_Configurer:
