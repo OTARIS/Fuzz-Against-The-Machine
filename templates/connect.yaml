@@ -1,0 +1,20 @@
+---
+ clientId:
+ protoname: MQTT
+ willtopic:
+ willmsg: 
+ username:
+ password:
+ klive: 
+ sess_expiry:
+ rec_max: 
+ max_pkt:
+ top_alias: 
+ req_res_info:
+ req_prob_info:
+ willdelay: 
+ resp_topic: 
+ willexpire:
+ user_property:
+   key:
+   value: 

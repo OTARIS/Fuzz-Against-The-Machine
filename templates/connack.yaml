@@ -1,0 +1,18 @@
+---
+ sessexpiry: 
+ rec_max: 
+ max_qos: 
+ retain_avail: 
+ max_pkt:
+ clientId: 
+ top_alias: 
+ reason_string:
+ user_property:
+   key:
+   value:
+ wild_sub: 
+ sub_id: 
+ shared_sub: 
+ server_klive:
+ res_info:
+ server_ref:
